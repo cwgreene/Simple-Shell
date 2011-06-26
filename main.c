@@ -1,21 +1,27 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strtok.h>
-#include <stdio.h>
+#include <string.h>
 
-char **split(char *string,char *delimeters){
+/**/
+/*Returns an array of non-empty strings terminated with NULL*/
+char **split(char *string,char *delimiters){
+	char *buffer = malloc(strlen(string));
+	strcpy(buffer,string);
 	char **result = (char **)malloc(sizeof(char **));
 	int length = 0;
-	char *pch = strtok(string,delimeters)
+	char *pch = strtok(buffer,delimiters);
 	while(pch != NULL)
 	{
 		length +=1;
-		result = (char **)realloc(result,sizeof(char **));
+		result = (char **)realloc(result,
+				          (length+1)*sizeof(char **));
 		result[length-1] = malloc(sizeof(char)*strlen(pch));
-		strcpy(result+length-1 ,pch);
+		strcpy(result[length-1],pch);
+		pch = strtok(NULL,delimiters);
 	}
 	result[length] = NULL;//Null terminate array, also empty string
+	free(buffer);
 	return result;
 }
 
@@ -40,12 +46,10 @@ void readcommand(char **command,char ***args)
 	{
 		buffer[i] = '\0';
 		return;
-	}else
+	}else{
 		buffer[i] = '\0';
 	}
-	
-	buffer = malloc(sizeof(char)*10);
-
+	//buffer = malloc(sizeof(char)*10);
 }
 
 int main()
@@ -72,4 +76,3 @@ int main()
 		free(command);
 	}
 }
-

@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**/
+/*split(char *string,char*delimiters)                       */
 /*Returns an array of non-empty strings terminated with NULL*/
+/*Free result with free_split                               */
 char **split(char *string,char *delimiters){
 	char *buffer = malloc(strlen(string));
 	strcpy(buffer,string);
@@ -25,7 +26,18 @@ char **split(char *string,char *delimiters){
 	return result;
 }
 
-void readcommand(char **command,char ***args)
+void free_split(char **split_result)
+{
+	int i=0;
+	while(split_result[i] != NULL)
+	{
+		free(split_result[i]);
+		i++;
+	}
+	free(split_result);
+}
+
+void readcommand_old(char **command,char ***args)
 {
 	char *buffer = malloc(sizeof(char)*10);
 	int i = 0;
@@ -52,6 +64,27 @@ void readcommand(char **command,char ***args)
 	//buffer = malloc(sizeof(char)*10);
 }
 
+void readcommand(char **command,char ***args)
+{
+	char *buffer = malloc(sizeof(char)*10);
+	int cursize = 10;
+	int i =0;
+	buffer[i]=getchar();
+	while(buffer[i] != '\n')
+	{
+		i++;
+		if(i % 10 == 0){
+			printf("resizing\n");
+			buffer = realloc(buffer,(cursize+10)*sizeof(char));
+			cursize +=10;
+		}
+		buffer[i] = getchar();
+	}
+	char **linesplit = split(buffer," \n");
+	*command = linesplit[0];
+	*args = linesplit+1;
+}
+
 int main()
 {
 	while(1){
@@ -61,10 +94,14 @@ int main()
 		
 		printf("$");
 		readcommand(&command,&args);
-
+		int i=0;
+		while(args[i]!=0){
+			printf("%s",args[i]);
+			i++;
+		}
 		if((pid = fork()) == 0){
 			printf("Executing: %s\n",command);
-			return execl(command,"",NULL);
+			return execv(command,args);
 		}else if(pid > 0){
 			wait(0);
 			printf("%d: terminated\n",pid);
@@ -73,6 +110,6 @@ int main()
 			exit(0);
 		}
 		//clean up
-		free(command);
+		free_split(args-1);
 	}
 }

@@ -37,33 +37,6 @@ void free_split(char **split_result)
 	free(split_result);
 }
 
-void readcommand_old(char **command,char ***args)
-{
-	char *buffer = malloc(sizeof(char)*10);
-	int i = 0;
-	int cursize = 10;
-	buffer[0] = getchar();
-	while(buffer[i] != ' ' && buffer[i] != '\n')
-	{
-		i++;
-		if(i % 10 == 0){
-			printf("resizing\n");
-			buffer = realloc(buffer,(cursize+10)*sizeof(char));
-			cursize +=10;
-		}
-		buffer[i] = getchar();
-	}
-	*command = buffer;
-	if(buffer[i] == '\n')
-	{
-		buffer[i] = '\0';
-		return;
-	}else{
-		buffer[i] = '\0';
-	}
-	//buffer = malloc(sizeof(char)*10);
-}
-
 void readcommand(char **command,char ***args)
 {
 	char *buffer = malloc(sizeof(char)*10);

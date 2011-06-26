@@ -25,7 +25,8 @@ char **split(char *string,char *delimiters){
 	free(buffer);
 	return result;
 }
-
+/*free_split(char **split_result) */
+/*Frees the result of a free_split*/
 void free_split(char **split_result)
 {
 	int i=0;
@@ -42,6 +43,8 @@ void readcommand(char **command,char ***args)
 	char *buffer = malloc(sizeof(char)*10);
 	int cursize = 10;
 	int i =0;
+
+	/*This is where autocomplete would go*/
 	buffer[i]=getchar();
 	while(buffer[i] != '\n')
 	{
@@ -53,9 +56,15 @@ void readcommand(char **command,char ***args)
 		}
 		buffer[i] = getchar();
 	}
+
+	/*split*/
 	char **linesplit = split(buffer," \n");
+	free(buffer);
+
+	/*return results*/
 	*command = linesplit[0];
-	*args = linesplit+1;
+	*args = linesplit;
+
 }
 
 int main()
@@ -69,7 +78,6 @@ int main()
 		readcommand(&command,&args);
 		int i=0;
 		while(args[i]!=0){
-			printf("%s",args[i]);
 			i++;
 		}
 		if((pid = fork()) == 0){
@@ -80,9 +88,9 @@ int main()
 			printf("%d: terminated\n",pid);
 		}else {
 			printf("error, failed to fork");
-			exit(0);
+			exit(-1);
 		}
 		//clean up
-		free_split(args-1);
+		free_split(args);
 	}
 }
